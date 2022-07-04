@@ -1,0 +1,10 @@
+test_vagrant_vm:
+  hosts:
+    test_vagrant_vm:
+      ansible_host: localhost
+      ansible_port: 2222
+      ansible_ssh_user: vagrant
+      ansible_ssh_private_key_file: ~/.vagrant.d/insecure_private_key
+      ansible_user: vagrant
+      ansible_become: yes
+      ansible_become_user: root
