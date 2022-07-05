@@ -1,0 +1,8 @@
+---
+# tasks file for compose
+- name: Installs Docker Compose Plugin
+  ansible.builtin.apt:
+    update_cache: yes
+    name: ['docker-compose-plugin']
+    state: present
+  become_user: ansible_facts['user_id']
