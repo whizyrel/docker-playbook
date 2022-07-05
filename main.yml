@@ -1,11 +1,10 @@
 - name: Docker and Compose Installation
   hosts: test_vagrant_vm
-  tasks:
-    - name: Prints all facts.
-      ansible.builtin.debug:
-        var: ansible_facts['user_id']
-      tags: never
   roles:
     - role: docker
+      when: "ansible_facts['os_family'] == 'Debian'"
+      # tags: never
+    
+    - role: compose
       when: "ansible_facts['os_family'] == 'Debian'"
       # tags: never

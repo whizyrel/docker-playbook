@@ -8,13 +8,6 @@
 - name: Creates a Keyring file
   command: sudo touch /etc/apt/keyrings/docker.gpg
 
-- name: Curls gpg from source
-  ansible.builtin.command: curl -fsSL https://download.docker.com/linux/ubuntu/gpg
-  register: docker_gpg
-
-- name: Writes gpg to file
-  ansible.builtin.shell: "sudo echo '{{ docker_gpg.stdout }}' > /etc/apt/keyrings/docker.gpg"
-
 - name: Gets release codename (short).
   ansible.builtin.command: lsb_release -cs
   register: release_name
@@ -23,14 +16,20 @@
   ansible.builtin.command: dpkg --print-architecture
   register: _architecture
 
-- name: Prints Architecture
-  ansible.builtin.debug:
-    var: _architecture.stdout
+- name: Curls gpg from source
+  ansible.builtin.command: curl -fsSL https://download.docker.com/linux/ubuntu/gpg
+  register: docker_gpg
+
+- name: Writes gpg to file
+  ansible.builtin.shell: "sudo echo '{{ docker_gpg.stdout }}' > docker.gpg"
+
+- name: GPG Dearmor...
+  ansible.builtin.shell: "sudo gpg --dearmor < docker.gpg > /etc/apt/keyrings/docker.gpg"
 
 - name: Setup all requirements for Docker Installation
   ansible.builtin.apt:
     # INFO this might already may have been installed
-    # update_cache: yes
+    update_cache: yes
     name: ['ca-certificates', 'curl', 'gnupg', 'lsb-release']
     state: present
   become_user: ansible_facts['user_id']
@@ -44,3 +43,12 @@
     filename: docker
   become_user: ansible_facts['user_id']
   # tags: never
+
+# sudo apt-get update
+# sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+- name: Installs Docker Engine, CLI, Containerd
+  ansible.builtin.apt:
+    update_cache: yes
+    name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+    state: present
+  become_user: ansible_facts['user_id']
